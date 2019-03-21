@@ -14,8 +14,10 @@ from clickhouse_mysql.tableprocessor import TableProcessor
 from clickhouse_mysql.util import Util
 #from pymysqlreplication.event import QueryEvent, RotateEvent, FormatDescriptionEvent
 
+print('mysqlreader ....... 1')
 
 class MySQLReader(Reader):
+    print('mysqlreader ....... 2')
     """Read data from MySQL as replication ls"""
 
     connection_settings = None
@@ -50,6 +52,7 @@ class MySQLReader(Reader):
             binlog_position_file=None,
             callbacks={},
     ):
+        print('mysqlreader ....... 3')
         super().__init__(callbacks=callbacks)
 
         self.connection_settings = connection_settings
@@ -66,32 +69,39 @@ class MySQLReader(Reader):
 
         logging.info("raw dbs list. len()=%d", 0 if schemas is None else len(schemas))
         if schemas is not None:
+            print('mysqlreader ....... 4')
             for schema in schemas:
                 logging.info(schema)
         logging.info("normalised dbs list. len()=%d", 0 if self.schemas is None else len(self.schemas))
         if self.schemas is not None:
+            print('mysqlreader ....... 5')
             for schema in self.schemas:
                 logging.info(schema)
 
         logging.info("raw tables list. len()=%d", 0 if tables is None else len(tables))
         if tables is not None:
+            print('mysqlreader ....... 6')
             for table in tables:
                 logging.info(table)
         logging.info("normalised tables list. len()=%d", 0 if self.tables is None else len(self.tables))
         if self.tables is not None:
+            print('mysqlreader ....... 7')
             for table in self.tables:
                 logging.info(table)
 
         logging.info("raw tables-prefixes list. len()=%d", 0 if tables_prefixes is None else len(tables_prefixes))
         if tables_prefixes is not None:
+            print('mysqlreader ....... 8')
             for table in tables_prefixes:
                 logging.info(table)
         logging.info("normalised tables-prefixes list. len()=%d", 0 if self.tables_prefixes is None else len(self.tables_prefixes))
         if self.tables_prefixes is not None:
+            print('mysqlreader ....... 9')
             for table in self.tables_prefixes:
                 logging.info(table)
 
         if not isinstance(self.server_id, int):
+            print('mysqlreader ....... 10')
             raise Exception("Please specify server_id of src server as int. Ex.: --src-server-id=1")
 
         self.binlog_stream = BinLogStreamReader(
@@ -127,14 +137,18 @@ class MySQLReader(Reader):
             resume_stream=self.resume_stream,
         )
 
+        print('mysqlreader ....... 11')
+
     def performance_report(self, start, rows_num, rows_num_per_event_min=None, rows_num_per_event_max=None, now=None):
         # log performance report
-
+        print('mysqlreader ....... 12')
         if now is None:
+            print('mysqlreader ....... 13')
             now = time.time()
 
         window_size = now - start
         if window_size > 0:
+            print('mysqlreader ....... 14')
             rows_per_sec = rows_num / window_size
             logging.info(
                 'PERF - %f rows/sec, min(rows/event)=%d max(rows/event)=%d for last %d rows %f sec',
@@ -144,10 +158,13 @@ class MySQLReader(Reader):
                 rows_num,
                 window_size,
             )
+            print('mysqlreader ....... 15')
         else:
+            print('mysqlreader ....... 16')
             logging.info("PERF - can not calc performance for time size=0")
 
     def is_table_listened(self, table):
+        print('mysqlreader ....... 17')
         """
         Check whether table name in either directly listed in tables or starts with prefix listed in tables_prefixes
         :param table: table name
@@ -156,11 +173,13 @@ class MySQLReader(Reader):
 
         # check direct table name match
         if self.tables:
+            print('mysqlreader ....... 18')
             if table in self.tables:
                 return True
 
         # check prefixes
         if self.tables_prefixes:
+            print('mysqlreader ....... 19')
             for prefix in self.tables_prefixes:
                 if table.startswith(prefix):
                     # table name starts with prefix list
@@ -176,20 +195,26 @@ class MySQLReader(Reader):
     rows_num_per_event_min = None
     rows_num_per_event_max = None
 
+    print('mysqlreader ....... 20')
+
     def init_read_events(self):
+        print('mysqlreader ....... 21')
         self.start_timestamp = int(time.time())
         self.first_rows_passed = []
 
     def init_fetch_loop(self):
+        print('mysqlreader ....... 22')
         self.start = time.time()
 
     def stat_init_fetch_loop(self):
+        print('mysqlreader ....... 23')
         self.rows_num = 0
         self.rows_num_since_interim_performance_report = 0
         self.rows_num_per_event_min = None
         self.rows_num_per_event_max = None
 
     def stat_close_fetch_loop(self):
+        print('mysqlreader ....... 24')
         if self.rows_num > 0:
             # we have some rows processed
             now = time.time()
@@ -198,6 +223,7 @@ class MySQLReader(Reader):
                 self.performance_report(self.start, self.rows_num, now)
 
     def stat_write_rows_event_calc_rows_num_min_max(self, rows_num_per_event):
+        print('mysqlreader ....... 25')
         # populate min value
         if (self.rows_num_per_event_min is None) or (rows_num_per_event < self.rows_num_per_event_min):
             self.rows_num_per_event_min = rows_num_per_event
@@ -207,20 +233,24 @@ class MySQLReader(Reader):
             self.rows_num_per_event_max = rows_num_per_event
 
     def stat_write_rows_event_all_rows(self, mysql_event):
+        print('mysqlreader ....... 26')
         self.write_rows_event_num += 1
         self.rows_num += len(mysql_event.rows)
         self.rows_num_since_interim_performance_report += len(mysql_event.rows)
         logging.debug('WriteRowsEvent #%d rows: %d', self.write_rows_event_num, len(mysql_event.rows))
 
     def stat_write_rows_event_each_row(self):
+        print('mysqlreader ....... 27')
         self.write_rows_event_each_row_num += 1
         logging.debug('WriteRowsEvent.EachRow #%d', self.write_rows_event_each_row_num)
 
     def stat_write_rows_event_each_row_for_each_row(self):
+        print('mysqlreader ....... 28')
         self.rows_num += 1
         self.rows_num_since_interim_performance_report += 1
 
     def stat_write_rows_event_finalyse(self):
+        print('mysqlreader ....... 29')
         if self.rows_num_since_interim_performance_report >= 100000:
             # speed report each N rows
             self.performance_report(
@@ -234,12 +264,14 @@ class MySQLReader(Reader):
             self.rows_num_per_event_max = None
 
     def process_first_event(self, event):
+        print('mysqlreader ....... 30')
         if "{}.{}".format(event.schema, event.table) not in self.first_rows_passed:
             Util.log_row(event.first_row(), "first row in replication {}.{}".format(event.schema, event.table))
             self.first_rows_passed.append("{}.{}".format(event.schema, event.table))
         logging.info(self.first_rows_passed)
 
     def process_write_rows_event(self, mysql_event):
+        print('mysqlreader ....... 31')
         """
         Process specific MySQL event - WriteRowsEvent
         :param mysql_event: WriteRowsEvent instance
@@ -257,6 +289,7 @@ class MySQLReader(Reader):
         self.stat_write_rows_event_calc_rows_num_min_max(rows_num_per_event=len(mysql_event.rows))
 
         if self.subscribers('WriteRowsEvent'):
+            print('mysqlreader ....... 32')
             # dispatch event to subscribers
 
             # statistics
@@ -272,6 +305,7 @@ class MySQLReader(Reader):
             self.notify('WriteRowsEvent', event=event)
 
         if self.subscribers('WriteRowsEvent.EachRow'):
+            print('mysqlreader ....... 33')
             # dispatch event to subscribers
 
             # statistics
@@ -294,18 +328,22 @@ class MySQLReader(Reader):
         self.stat_write_rows_event_finalyse()
 
     def process_update_rows_event(self, mysql_event):
+        print('mysqlreader ....... 34')
         logging.info("Skip update rows")
 
     def process_delete_rows_event(self, mysql_event):
+        print('mysqlreader ....... 35')
         logging.info("Skip delete rows")
 
     def process_binlog_position(self, file, pos):
+        print('mysqlreader ....... 36')
         if self.binlog_position_file:
             with open(self.binlog_position_file, "w") as f:
                 f.write("{}:{}".format(file, pos))
         logging.debug("Next event binlog pos: {}.{}".format(file, pos))
 
     def read(self):
+        print('mysqlreader ....... 37')
         # main function - read data from source
 
         self.init_read_events()
@@ -321,6 +359,7 @@ class MySQLReader(Reader):
                 self.stat_init_fetch_loop()
 
                 try:
+                    print('mysqlreader ....... 38')
                     # fetch available events from MySQL
                     for mysql_event in self.binlog_stream:
                         # new event has come
@@ -341,10 +380,12 @@ class MySQLReader(Reader):
                         self.process_binlog_position(self.binlog_stream.log_file, self.binlog_stream.log_pos)
 
                 except KeyboardInterrupt:
+                    print('mysqlreader ....... 39')
                     # pass SIGINT further
                     logging.info("SIGINT received. Pass it further.")
                     raise
                 except Exception as ex:
+                    print('mysqlreader ....... 40')
                     if self.blocking:
                         # we'd like to continue waiting for data
                         # report and continue cycle
@@ -362,24 +403,30 @@ class MySQLReader(Reader):
                 self.stat_close_fetch_loop()
 
                 if not self.blocking:
+                    print('mysqlreader ....... 41')
                     # do not wait for more data - all done
                     break # while True
 
                 # blocking - wait for more data
                 if self.nice_pause > 0:
+                    print('mysqlreader ....... 42')
                     time.sleep(self.nice_pause)
 
                 self.notify('ReaderIdleEvent')
 
         except KeyboardInterrupt:
+            print('mysqlreader ....... 43')
             logging.info("SIGINT received. Time to exit.")
         except Exception as ex:
+            print('mysqlreader ....... 44')
             logging.warning("Got an exception, handle it")
             logging.warning(ex)
 
         try:
+            print('mysqlreader ....... 45')
             self.binlog_stream.close()
         except Exception as ex:
+            print('mysqlreader ....... 46')
             logging.warning("Unable to close binlog stream correctly")
             logging.warning(ex)
 
@@ -390,6 +437,7 @@ class MySQLReader(Reader):
         logging.info('len %d', end_timestamp - self.start_timestamp)
 
 if __name__ == '__main__':
+    print('mysqlreader ....... 47')
     connection_settings = {
         'host': '127.0.0.1',
         'port': 3306,

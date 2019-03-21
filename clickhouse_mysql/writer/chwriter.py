@@ -9,8 +9,10 @@ from clickhouse_mysql.dbclient.chclient import CHClient
 from clickhouse_mysql.writer.writer import Writer
 from clickhouse_mysql.event.event import Event
 
+print('ch writer ....... 1')
 
 class CHWriter(Writer):
+    print('ch writer ....... 2')
     """ClickHouse writer"""
 
     client = None
@@ -25,12 +27,14 @@ class CHWriter(Writer):
             next_writer_builder=None,
             converter_builder=None,
     ):
+        print('ch writer ....... 3')
         logging.info("CHWriter() connection_settings={} dst_schema={} dst_table={}".format(connection_settings, dst_schema, dst_table))
         self.client = CHClient(connection_settings)
         self.dst_schema = dst_schema
         self.dst_table = dst_table
 
     def insert(self, event_or_events=None):
+        print('ch writer ....... 4')
         # event_or_events = [
         #   event: {
         #       row: {'id': 3, 'a': 3}
@@ -42,6 +46,7 @@ class CHWriter(Writer):
 
         events = self.listify(event_or_events)
         if len(events) < 1:
+            print('ch writer ....... 5')
             logging.warning('No events to insert. class: %s', __class__)
             return
 
@@ -53,6 +58,7 @@ class CHWriter(Writer):
 
         rows = []
         event_converted = None
+        print('ch writer ....... 6')
         for event in events:
             if not event.verify:
                 logging.warning('Event verification failed. Skip one event. Event: %s Class: %s', event.meta(), __class__)
@@ -74,6 +80,7 @@ class CHWriter(Writer):
 
         sql = ''
         try:
+            print('ch writer ....... 7')
             sql = 'INSERT INTO `{0}`.`{1}` ({2}) VALUES'.format(
                 schema,
                 table,
@@ -81,6 +88,7 @@ class CHWriter(Writer):
             )
             self.client.execute(sql, rows)
         except Exception as ex:
+            print('ch writer ....... 8')
             logging.critical('QUERY FAILED')
             logging.critical('ex={}'.format(ex))
             logging.critical('sql={}'.format(sql))
@@ -92,6 +100,7 @@ class CHWriter(Writer):
 
 
 if __name__ == '__main__':
+    print('ch writer ....... 9')
     connection_settings = {
         'host': '192.168.74.230',
         'port': 9000,

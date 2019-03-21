@@ -19,22 +19,32 @@ from clickhouse_mysql.clioptions import CLIOptions
 from clickhouse_mysql.pumper import Pumper
 from clickhouse_mysql.daemon import Daemon
 from clickhouse_mysql.config import Config
-
+print('*'*30)
+print('came here ...2')
 
 class Main(Daemon):
 
     config = None
 
     def __init__(self):
-
+        print('*'*30)
+        print('came here ...3')
         # append 'converter' folder into sys.path
         # this helps to load custom modules
         converter_folder = os.path.dirname(os.path.realpath(__file__)) + '/converter'
+        print('*'*30)
+        print("converter_folder is {}".format(converter_folder))
+        print('*'*30)
+        print("sys.path before is {}".format(sys.path))
         if converter_folder not in sys.path:
             sys.path.insert(0, converter_folder)
+            print('*'*30)
+            print("sys.path after is {}".format(sys.path))
 
         # parse CLI options
         self.config = Config()
+        print('*'*30)
+        print("config is {}".format(self.config))
 
         # first action after config available - setup requested logging level
         logging.basicConfig(
@@ -163,5 +173,6 @@ class Main(Daemon):
 
 
 if __name__ == '__main__':
+    print('came here ...1')
     main = Main()
     main.start()

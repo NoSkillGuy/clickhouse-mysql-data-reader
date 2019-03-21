@@ -7,8 +7,9 @@ import logging
 
 from clickhouse_mysql.writer.writer import Writer
 
-
+print('ch csv writer ....... 1')
 class CHCSVWriter(Writer):
+    print('ch csv writer ....... 2')
     """Write into ClickHouse via CSV file and clickhouse-client tool"""
 
     dst_schema = None
@@ -25,6 +26,7 @@ class CHCSVWriter(Writer):
             dst_schema=None,
             dst_table=None,
     ):
+        print('ch csv writer ....... 3')
         logging.info("CHCSWriter() connection_settings={} dst_schema={} dst_table={}".format(connection_settings, dst_schema, dst_table))
         self.host = connection_settings['host']
         self.port = connection_settings['port']
@@ -34,6 +36,7 @@ class CHCSVWriter(Writer):
         self.dst_table = dst_table
 
     def insert(self, event_or_events=None):
+        print('ch csv writer ....... 4')
         # event_or_events = [
         #   event: {
         #       row: {'id': 3, 'a': 3}
@@ -45,6 +48,7 @@ class CHCSVWriter(Writer):
 
         events = self.listify(event_or_events)
         if len(events) < 1:
+            print('ch csv writer ....... 5')
             logging.warning('No events to insert. class: %s', __class__)
             return
 
@@ -53,6 +57,7 @@ class CHCSVWriter(Writer):
         logging.debug('class:%s insert %d rows', __class__, len(events))
 
         for event in events:
+            print('ch csv writer ....... 6')
             schema = self.dst_schema if self.dst_schema else event.schema
             table = self.dst_table if self.dst_table else event.table
 
