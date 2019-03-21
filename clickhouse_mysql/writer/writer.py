@@ -13,9 +13,9 @@ class Writer(object):
         next_writer_builder=None,
         converter_builder=None
     ):
-    self.next_writer_builder = next_writer_builder
-    self.converter_builder = converter_builder
-    print('writter ....... 3')
+        self.next_writer_builder = next_writer_builder
+        self.converter_builder = converter_builder
+        print('writter ....... 3')
 
     def opened(self):
         print('writter ....... 4')
